@@ -2,19 +2,24 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import os
-import logging  # ✅ Tambahkan ini agar logging bisa digunakan
+import re
+import logging
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 
-if "TELEGRAM_TOKEN" not in os.environ:
+# Logging
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+
+# Token
+TOKEN = os.getenv("TELEGRAM_TOKEN")
+if not TOKEN:
     raise RuntimeError("❌ TELEGRAM_TOKEN not set in environment variables.")
 
-TOKEN = os.environ["TELEGRAM_TOKEN"]
-
-logging.basicConfig(level=logging.INFO)
-
-
+# Start command
 def start(update, context):
     update.message.reply_text("Selamat datang di bot evaluasi sinyal token! Kirimkan sinyal token untuk evaluasi.")
 
+# Parsing sinyal
 def parse_signal(text: str) -> dict:
     header_re = re.compile(r"💊\s*#(?P<chain>\w+) - (?P<name>.*?) ｜ \$(?P<symbol>\S+)")
     cap_re = re.compile(r"💸 Market Cap: \$(?P<cap>[\d\.]+)(?P<unit>k|M)?")
@@ -36,6 +41,7 @@ def parse_signal(text: str) -> dict:
     if m := age_re.search(text): data['pool_age_min'] = int(m.group('age'))
     return data
 
+# Evaluasi sinyal
 def score_signal(data: dict) -> tuple:
     score = 0
     reasons = []
@@ -56,6 +62,7 @@ def score_signal(data: dict) -> tuple:
     label = "✅ GOOD SIGNAL" if score >= 5 else "⚠️ AVERAGE" if score >= 3 else "❌ BAD SIGNAL"
     return label, score, reasons
 
+# Handler pesan biasa
 def handle_signal(update, context):
     text = update.message.text
     data = parse_signal(text)
@@ -73,6 +80,7 @@ def handle_signal(update, context):
 
     update.message.reply_text(message, reply_markup=keyboard)
 
+# Feedback handler
 def handle_feedback(update, context):
     query = update.callback_query
     feedback = query.data
@@ -82,7 +90,7 @@ def handle_feedback(update, context):
     # Ambil pesan sinyal asli
     signal_text = query.message.text
 
-    # Ekstrak label (Good/Average/Bad) dari baris pertama pesan
+    # Ekstrak label
     lines = signal_text.splitlines()
     label = lines[0].strip() if lines else ""
 
@@ -90,8 +98,8 @@ def handle_feedback(update, context):
     with open("feedback_log.csv", "a", encoding="utf-8") as f:
         f.write(f'"{label}","{feedback}"\n')
 
+# Main loop
 def main():
-    # Update: gunakan Updater tanpa `use_context=True` pada versi 13.15
     updater = Updater(TOKEN)
     dp = updater.dispatcher
 
