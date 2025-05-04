@@ -2,14 +2,13 @@ import os
 import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, CallbackQueryHandler
-from dotenv import load_dotenv
 import re
 
-# Load token dari .env
-load_dotenv()
-TOKEN = os.getenv("TELEGRAM_TOKEN")
+# Ambil token langsung dari Railway environment
+TOKEN = os.environ["TELEGRAM_TOKEN"]
 
 logging.basicConfig(level=logging.INFO)
+
 
 def start(update, context):
     update.message.reply_text("Selamat datang di bot evaluasi sinyal token! Kirimkan sinyal token untuk evaluasi.")
