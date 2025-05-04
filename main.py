@@ -1,11 +1,10 @@
 import os
-import logging
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, CallbackQueryHandler
-import re
 
-# Ambil token langsung dari Railway environment
+if "TELEGRAM_TOKEN" not in os.environ:
+    raise RuntimeError("❌ TELEGRAM_TOKEN not set in environment variables.")
+
 TOKEN = os.environ["TELEGRAM_TOKEN"]
+
 
 logging.basicConfig(level=logging.INFO)
 
