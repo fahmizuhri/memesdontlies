@@ -1,5 +1,7 @@
-import os
+from dotenv import load_dotenv
+load_dotenv()
 
+import os
 if "TELEGRAM_TOKEN" not in os.environ:
     raise RuntimeError("❌ TELEGRAM_TOKEN not set in environment variables.")
 
