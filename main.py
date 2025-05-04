@@ -2,11 +2,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import os
+import logging  # ✅ Tambahkan ini agar logging bisa digunakan
+
 if "TELEGRAM_TOKEN" not in os.environ:
     raise RuntimeError("❌ TELEGRAM_TOKEN not set in environment variables.")
 
 TOKEN = os.environ["TELEGRAM_TOKEN"]
-
 
 logging.basicConfig(level=logging.INFO)
 
