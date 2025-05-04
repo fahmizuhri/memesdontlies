@@ -90,7 +90,8 @@ def handle_feedback(update, context):
         f.write(f'"{label}","{feedback}"\n')
 
 def main():
-    updater = Updater(TOKEN, use_context=True)
+    # Update: gunakan Updater tanpa `use_context=True` pada versi 13.15
+    updater = Updater(TOKEN)
     dp = updater.dispatcher
 
     dp.add_handler(CommandHandler("start", start))
